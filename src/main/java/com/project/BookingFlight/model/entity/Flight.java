@@ -19,7 +19,7 @@ public class Flight {
     private Long id;
     @Column(name = "airlineCode",nullable = false)
     private String airlineCode;
-    @Column(name = "flightNumber",nullable = false)
+    @Column(name = "flightNumber",nullable = false,unique = true)
     private String flightNumber;
     @Column(name = "origin",nullable = false)
     private String origin;

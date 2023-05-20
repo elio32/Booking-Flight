@@ -14,7 +14,14 @@ public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne
+
+    @Column(name = "isCanceled")
+    private boolean isCancelled;
+
+    @Column(name = "cancellationReason")
+    private String cancellationReason;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id",nullable = false)
     private UserApp user;
 
@@ -25,10 +32,4 @@ public class Booking {
             inverseJoinColumns = @JoinColumn(name = "flight_id")
     )
     private List<Flight> flights;
-
-    @Column(name = "isCanceled")
-    private boolean isCancelled;
-
-    @Column(name = "cancellationReason")
-    private String cancellationReason;
 }
