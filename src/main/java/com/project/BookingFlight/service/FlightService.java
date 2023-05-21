@@ -10,7 +10,7 @@ public interface FlightService {
     List<FlightDTO> getAllFlights();
     void deleteFlight(Long id);
     FlightDTO saveNewFlight(Flight flight);
-    FlightDTO findFlightByOriginOrDestinationOrDepartureDateOrAirlineCode(String origin, String destination,
+    List<FlightDTO> findFlightByOriginOrDestinationOrDepartureDateOrAirlineCode(String origin, String destination,
                                                                           Date departureDate, String airlineCode);
     FlightDTO updateFlight(Long id, Flight requestedFlight);
 }

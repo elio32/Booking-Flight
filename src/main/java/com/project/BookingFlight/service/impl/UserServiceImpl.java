@@ -5,7 +5,6 @@ import com.project.BookingFlight.mapper.UserMapper;
 import com.project.BookingFlight.model.dto.UserDTO;
 import com.project.BookingFlight.model.entity.Booking;
 import com.project.BookingFlight.model.entity.Flight;
-import com.project.BookingFlight.model.entity.Pagination;
 import com.project.BookingFlight.model.entity.UserApp;
 import com.project.BookingFlight.repository.BookingRepository;
 import com.project.BookingFlight.repository.FlightRepository;
@@ -13,9 +12,6 @@ import com.project.BookingFlight.repository.UserRepository;
 import com.project.BookingFlight.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -33,10 +29,10 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    private UserRepository userRepository;
-    private UserMapper userMapper;
-    private FlightRepository flightRepository;
-    private BookingRepository bookingRepository;
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
+    private final FlightRepository flightRepository;
+    private final BookingRepository bookingRepository;
     private final BCryptPasswordEncoder encoder;
 
     @Override
@@ -51,12 +47,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDTO> getAllUsers() { // se di a eshte e sakt paginationi
-//        if(pagination == null) pagination = new Pagination();
-//        log.info("Fetching all users {} from DB",pagination.toString());
-//        Pageable pageable = PageRequest.of(pagination.getPageNumber(), pagination.getPageSize(),
-//                pagination.getSortByAscendingOrder() ? Sort.by(pagination.getSortByProperty()).ascending()
-//                        : Sort.by(pagination.getSortByProperty()).descending());
+    public List<UserDTO> getAllUsers() {
         return userRepository.findAll().stream().map(userMapper::toDto).collect(Collectors.toList());
     }
 
@@ -65,16 +56,8 @@ public class UserServiceImpl implements UserService {
         log.info("Fetching User{} from DB",email);
         Optional<UserApp> user = userRepository.findByEmail(email);
         checkIfUserExist(user);
-        return userMapper.toDto(user.get());//jep error pa .get
-
-    }
-
-    @Override
-    public UserDTO getUserById(Long id) {
-        log.info("Fetching User with id{} from DB",id);
-        Optional<UserApp> user = userRepository.findById(id);
-        checkIfUserExist(user);
         return userMapper.toDto(user.get());
+
     }
 
     @Override

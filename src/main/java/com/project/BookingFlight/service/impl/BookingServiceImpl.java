@@ -4,14 +4,21 @@ import com.project.BookingFlight.exception.GeneralException;
 import com.project.BookingFlight.mapper.BookingMapper;
 import com.project.BookingFlight.model.dto.BookingDTO;
 import com.project.BookingFlight.model.entity.Booking;
+import com.project.BookingFlight.model.entity.Pagination;
 import com.project.BookingFlight.model.entity.UserApp;
+import com.project.BookingFlight.model.enums.UserRoleEnum;
 import com.project.BookingFlight.repository.BookingRepository;
 import com.project.BookingFlight.repository.UserRepository;
 import com.project.BookingFlight.service.BookingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -21,9 +28,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class BookingServiceImpl implements BookingService {
 
-    private UserRepository userRepository;
-    private BookingRepository bookingRepository;
-    private BookingMapper bookingMapper;
+    private final UserRepository userRepository;
+    private final BookingRepository bookingRepository;
+    private final BookingMapper bookingMapper;
 
     @Override
     public List<BookingDTO> getAllBookingsByTraveller(Long travellerId) {
@@ -33,29 +40,41 @@ public class BookingServiceImpl implements BookingService {
         return bookings.stream().map(bookingMapper::toDto).collect(Collectors.toList());
     }
 
-    @Override
-    public void deleteBooking(Long id) {
+    public BookingDTO requestBookingCancellation(Long bookingId, String declineReason, UserRoleEnum userRole) {
+        Optional<Booking> existingBooking = bookingRepository.findById(bookingId);
+        checkIfBookingExist(existingBooking);
+        Booking booking = existingBooking.get();
 
+        // Check if booking is already cancelled
+        if (booking.isCancelled()) {
+            throw new GeneralException("Booking has already been cancelled.", Arrays.asList(existingBooking));
+        }
+        // Handle traveler's cancellation request
+        if (userRole == UserRoleEnum.ROLE_TRAVELLER) {
+            // Update booking status to "Cancellation Requested"
+            booking.setCancelled(true);
+            booking.setCancellationReason(null);
+        }
+        // Handle admin decline cancellation request
+        if (userRole == UserRoleEnum.ADMIN && declineReason != null && !declineReason.isEmpty()) {
+            // Update booking status to "Declined" and set the decline reason
+            booking.setCancelled(false);
+            booking.setCancellationReason(declineReason);
+        }
+        bookingRepository.save(booking);
+        return bookingMapper.toDto(booking);
     }
 
     @Override
-    public BookingDTO findBookingById(Long id) {
-        return null;
-    }
-
-    @Override
-    public BookingDTO saveNewBooking(Booking booking) {
-        return null;
-    }
-
-    @Override
-    public List<BookingDTO> showAllBookings(Long id) {
-        return null;
-    }
-
-    @Override
-    public BookingDTO saveNewBookingForUser(Long userId, Booking booking) {
-        return null;
+    public List<BookingDTO> getUserBookings(Long userId, Pagination pagination) {
+        if(pagination == null) pagination = new Pagination();
+        log.info("Fetching all Users with {}", pagination.toString());
+        Pageable pageable = PageRequest.of(pagination.getPageNumber(), pagination.getPageSize(),
+                pagination.getSortByAscendingOrder() ? Sort.by("flight.departureDate").ascending()
+                        : Sort.by("flight.departureDate").descending());
+        Page<Booking> bookingPage = bookingRepository.findByUserId(userId,pageable);// mbas pageable me duket duhet .getContent
+        List<BookingDTO> bookingDTO = bookingPage.stream().map(bookingMapper::toDto).collect(Collectors.toList());
+        return bookingDTO;
     }
 
 
