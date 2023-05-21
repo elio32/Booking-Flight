@@ -1,6 +1,7 @@
 package com.project.BookingFlight.model.dto;
 
 import com.project.BookingFlight.model.enums.BookingClassesEnum;
+import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,6 +23,12 @@ public class FlightDTO {
     private LocalTime departureTime;
     private LocalTime arrivalTime;
     private Double price;
-    private Integer totalSeats;
-    private BookingClassesEnum  bookingClasses;
+    private Integer totalEconomySeats;
+    private Integer totalPremiumEconomySeats;
+    private Integer totalBusinessSeats;
+    private Integer totalFirstClassSeats;
+    private Integer availableEconomySeats;
+    private Integer availablePremiumEconomySeats;
+    private Integer availableBusinessSeats;
+    private Integer availableFirstClassSeats;
 }

@@ -14,11 +14,11 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
-@EnableWebSecurity
-@EnableMethodSecurity
+//@EnableWebSecurity
+//@EnableMethodSecurity
 public class SecurityConfiguration {
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public BCryptPasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
     private static final String[] AUTH_WHITELIST = {
@@ -35,17 +35,17 @@ public class SecurityConfiguration {
 //        this.tokenFilter = tokenFilter;
 //    }
 //
-//    @Bean
-//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//        return http.csrf().disable()
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        return http.csrf().disable()
 //                .authorizeHttpRequests()
 //                .requestMatchers(AUTH_WHITELIST).permitAll()
 //                .anyRequest().authenticated()
 //                .and()
 //                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 //                .and().addFilterBefore(tokenFilter, UsernamePasswordAuthenticationFilter.class)
-//                .build();
-//    }
+                .build();
+    }
 //    @Bean
 //    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception{
 //        return authenticationConfiguration.getAuthenticationManager();

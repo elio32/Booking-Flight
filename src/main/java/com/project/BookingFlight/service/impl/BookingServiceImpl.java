@@ -50,7 +50,7 @@ public class BookingServiceImpl implements BookingService {
             throw new GeneralException("Booking has already been cancelled.", Arrays.asList(existingBooking));
         }
         // Handle traveler's cancellation request
-        if (userRole == UserRoleEnum.ROLE_TRAVELLER) {
+        if (userRole == UserRoleEnum.TRAVELLER) {
             // Update booking status to "Cancellation Requested"
             booking.setCancelled(true);
             booking.setCancellationReason(null);
@@ -75,6 +75,14 @@ public class BookingServiceImpl implements BookingService {
         Page<Booking> bookingPage = bookingRepository.findByUserId(userId,pageable);// mbas pageable me duket duhet .getContent
         List<BookingDTO> bookingDTO = bookingPage.stream().map(bookingMapper::toDto).collect(Collectors.toList());
         return bookingDTO;
+    }
+
+    @Override
+    public BookingDTO createBooking(Booking booking) {
+
+
+        return null;
+
     }
 
 

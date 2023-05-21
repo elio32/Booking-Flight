@@ -120,11 +120,29 @@ public class FlightServiceImpl implements FlightService {
             if (requestedFlight.getPrice() != null) {
                 flight.setPrice(requestedFlight.getPrice());
             }
-            if (requestedFlight.getTotalSeats() != null) {
-                flight.setTotalSeats(requestedFlight.getTotalSeats());
+            if (requestedFlight.getTotalEconomySeats() != null) {
+                flight.setTotalEconomySeats(requestedFlight.getTotalEconomySeats());
             }
-            if (requestedFlight.getBookingClasses() != null) {
-                flight.setBookingClasses(requestedFlight.getBookingClasses());
+            if (requestedFlight.getTotalPremiumEconomySeats() != null) {
+                flight.setTotalPremiumEconomySeats(requestedFlight.getTotalPremiumEconomySeats());
+            }
+            if (requestedFlight.getTotalBusinessSeats() != null) {
+                flight.setTotalBusinessSeats(requestedFlight.getTotalBusinessSeats());
+            }
+            if (requestedFlight.getTotalFirstClassSeats() != null) {
+                flight.setTotalFirstClassSeats(requestedFlight.getTotalFirstClassSeats());
+            }
+            if (requestedFlight.getAvailableEconomySeats() != null) {
+                flight.setAvailableEconomySeats(requestedFlight.getAvailableEconomySeats());
+            }
+            if (requestedFlight.getAvailablePremiumEconomySeats() != null) {
+                flight.setAvailablePremiumEconomySeats(requestedFlight.getAvailablePremiumEconomySeats());
+            }
+            if (requestedFlight.getAvailableBusinessSeats() != null) {
+                flight.setAvailableBusinessSeats(requestedFlight.getAvailableBusinessSeats());
+            }
+            if (requestedFlight.getAvailableFirstClassSeats() != null) {
+                flight.setAvailableFirstClassSeats(requestedFlight.getAvailableFirstClassSeats());
             }
             if (requestedFlight.getBookings() != null) {
                 flight.setBookings(requestedFlight.getBookings());

@@ -25,8 +25,14 @@ public class FlightMapper extends AbstractMapper<Flight, FlightDTO>{
         flight.setDepartureTime(flightDTO.getDepartureTime());
         flight.setArrivalTime(flightDTO.getArrivalTime());
         flight.setPrice(flightDTO.getPrice());
-        flight.setTotalSeats(flightDTO.getTotalSeats());
-        flight.setBookingClasses(flightDTO.getBookingClasses());
+        flight.setTotalEconomySeats(flightDTO.getTotalEconomySeats());
+        flight.setTotalPremiumEconomySeats(flightDTO.getTotalPremiumEconomySeats());
+        flight.setTotalBusinessSeats(flightDTO.getTotalBusinessSeats());
+        flight.setTotalFirstClassSeats(flightDTO.getTotalFirstClassSeats());
+        flight.setAvailableEconomySeats(flightDTO.getAvailableEconomySeats());
+        flight.setAvailablePremiumEconomySeats(flightDTO.getAvailablePremiumEconomySeats());
+        flight.setAvailableBusinessSeats(flightDTO.getAvailableBusinessSeats());
+        flight.setAvailableFirstClassSeats(flightDTO.getTotalFirstClassSeats());
         return flight;
     }
 
@@ -46,7 +52,14 @@ public class FlightMapper extends AbstractMapper<Flight, FlightDTO>{
         flightDTO.setArrivalDate(flight.getArrivalDate());
         flightDTO.setDepartureTime(flight.getDepartureTime());
         flightDTO.setArrivalTime(flight.getArrivalTime());
-        flightDTO.setBookingClasses(flight.getBookingClasses());
+        flightDTO.setTotalEconomySeats(flight.getTotalEconomySeats());
+        flightDTO.setTotalPremiumEconomySeats(flight.getTotalPremiumEconomySeats());
+        flightDTO.setTotalBusinessSeats(flight.getTotalBusinessSeats());
+        flightDTO.setTotalFirstClassSeats(flight.getTotalFirstClassSeats());
+        flightDTO.setAvailableEconomySeats(flight.getAvailableEconomySeats());
+        flightDTO.setAvailablePremiumEconomySeats(flight.getAvailablePremiumEconomySeats());
+        flightDTO.setAvailableBusinessSeats(flight.getAvailableBusinessSeats());
+        flightDTO.setAvailableFirstClassSeats(flight.getTotalFirstClassSeats());
         return flightDTO;
     }
 }
