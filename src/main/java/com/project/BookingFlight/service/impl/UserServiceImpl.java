@@ -6,15 +6,13 @@ import com.project.BookingFlight.model.dto.UserDTO;
 import com.project.BookingFlight.model.entity.Booking;
 import com.project.BookingFlight.model.entity.Flight;
 import com.project.BookingFlight.model.entity.UserApp;
+import com.project.BookingFlight.model.enums.UserRoleEnum;
 import com.project.BookingFlight.repository.BookingRepository;
 import com.project.BookingFlight.repository.FlightRepository;
 import com.project.BookingFlight.repository.UserRepository;
 import com.project.BookingFlight.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,17 +32,6 @@ public class UserServiceImpl implements UserService {
     private final FlightRepository flightRepository;
     private final BookingRepository bookingRepository;
     private final BCryptPasswordEncoder encoder;
-
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<UserApp> user = userRepository.findByUsername(username);
-        log.info("Checking if this username {} exist",username);
-        if (user.isEmpty() || !user.get().isEnabled()){
-            log.info("Username {} not found",username);
-            throw new UsernameNotFoundException("User with username " + username + " not found");
-        }
-        return new User(user.get().getUsername(),user.get().getPassword(),user.get().getAuthorities());
-    }
 
     @Override
     public List<UserDTO> getAllUsers() {
@@ -120,6 +107,33 @@ public class UserServiceImpl implements UserService {
                 .stream().map(Booking::getUser).collect(Collectors.toList());
 
         return travellers.stream().map(userMapper::toDto).collect(Collectors.toList());
+    }
+
+    public UserDTO register(UserDTO userDTO) {
+
+        log.info("Checking if Username or Email exist");
+        if (userRepository.findByUsername(userDTO.getUsername()).isPresent()) {
+            throw new GeneralException("Username already exists",null);
+        }
+        if (userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
+            throw new GeneralException("Email already exists",null);
+        }
+
+        log.info("Creating new user");
+        // Create a new UserApp entity
+        UserApp user = new UserApp();
+        user.setUsername(userDTO.getUsername());
+        user.setPassword(encoder.encode(userDTO.getPassword()));
+        user.setFirstName(userDTO.getFirstName());
+        user.setLastName(userDTO.getLastName());
+        user.setEmail(userDTO.getEmail());
+        user.setPhoneNumber(userDTO.getPhoneNumber());
+        user.setAddress(userDTO.getAddress());
+        user.setRole(UserRoleEnum.TRAVELLER);
+
+        UserApp savedUser = userRepository.save(user);
+
+        return userMapper.toDto(savedUser);
     }
 
     private void checkIfUserExist(Optional<UserApp> user) {

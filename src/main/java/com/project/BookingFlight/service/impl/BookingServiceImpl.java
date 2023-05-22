@@ -45,7 +45,6 @@ public class BookingServiceImpl implements BookingService {
         checkIfBookingExist(existingBooking);
         Booking booking = existingBooking.get();
 
-        // Check if booking is already cancelled
         if (booking.isCancelled()) {
             throw new GeneralException("Booking has already been cancelled.", Arrays.asList(existingBooking));
         }

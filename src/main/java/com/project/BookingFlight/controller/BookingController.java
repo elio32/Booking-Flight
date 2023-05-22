@@ -8,6 +8,7 @@ import com.project.BookingFlight.service.BookingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.List;
 public class BookingController {
     private final BookingService bookingService;
 
+    @PreAuthorize(value = "hasAnyRole('ADMIN')")
     @GetMapping("/traveller/{travellerId}")
     public ResponseEntity<List<BookingDTO>> getAllBookingsForTraveller(@PathVariable(value = "travellerId") Long travellerId){
         return ResponseEntity.ok(bookingService.getAllBookingsByTraveller(travellerId));

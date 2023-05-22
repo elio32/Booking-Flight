@@ -1,6 +1,5 @@
 package com.project.BookingFlight.model.entity;
 
-import com.project.BookingFlight.model.enums.BookingClassesEnum;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;

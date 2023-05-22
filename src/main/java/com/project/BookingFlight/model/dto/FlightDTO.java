@@ -1,7 +1,5 @@
 package com.project.BookingFlight.model.dto;
 
-import com.project.BookingFlight.model.enums.BookingClassesEnum;
-import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

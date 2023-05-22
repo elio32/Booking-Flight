@@ -160,6 +160,7 @@ public class FlightServiceImpl implements FlightService {
         }
     }
 
+
     private boolean hasTravelerBookings(Flight flight) {
         return !flight.getBookings().isEmpty();
     }
