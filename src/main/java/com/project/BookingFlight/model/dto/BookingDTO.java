@@ -13,6 +13,8 @@ import java.util.List;
 public class BookingDTO {
     private Long id;
     private List<Flight> flights;
-    private boolean isCancelled;
+    private Boolean isCancelled;
     private String cancellationReason;
+    private Boolean awaitingCancellation;
+
 }

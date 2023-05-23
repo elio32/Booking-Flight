@@ -9,7 +9,8 @@ import java.util.List;
 
 public interface BookingService {
     List<BookingDTO> getAllBookingsByTraveller(Long travellerId);
-    BookingDTO requestBookingCancellation(Long bookingId, String declineReason, UserRoleEnum userRole);
+    BookingDTO requestBookingCancellation(Long bookingId, UserRoleEnum userRole);
     List<BookingDTO> getUserBookings(Long userId, Pagination pagination);
+    BookingDTO confirmBookingCancellation(Long bookingId, String declineReason, UserRoleEnum userRole);
     BookingDTO createBooking(Booking booking);
 }

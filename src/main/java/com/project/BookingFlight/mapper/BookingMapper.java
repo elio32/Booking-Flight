@@ -17,7 +17,8 @@ public class BookingMapper extends AbstractMapper<Booking, BookingDTO>{
         log.info("Converting BookingDTO to Entity");
         Booking booking = new Booking();
         booking.setId(bookingDTO.getId());
-        booking.setCancelled(bookingDTO.isCancelled());
+        booking.setIsCancelled(bookingDTO.getIsCancelled());
+        booking.setAwaitingCancellation(bookingDTO.getAwaitingCancellation());
         booking.setCancellationReason(bookingDTO.getCancellationReason());
         return booking;
 
@@ -32,7 +33,8 @@ public class BookingMapper extends AbstractMapper<Booking, BookingDTO>{
         BookingDTO bookingDTO = new BookingDTO();
         bookingDTO.setId(booking.getId());
         bookingDTO.setFlights(booking.getFlights());
-        bookingDTO.setCancelled(booking.isCancelled());
+        bookingDTO.setIsCancelled(booking.getIsCancelled());
+        bookingDTO.setAwaitingCancellation(booking.getAwaitingCancellation());
         bookingDTO.setCancellationReason(booking.getCancellationReason());
         return bookingDTO;
     }

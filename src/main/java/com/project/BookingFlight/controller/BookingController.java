@@ -32,7 +32,7 @@ public class BookingController {
             @RequestParam(required = false) UserRoleEnum userRole
     ) {
         try {
-            BookingDTO bookingDTO = bookingService.requestBookingCancellation(bookingId, declineReason, userRole);
+            BookingDTO bookingDTO = bookingService.requestBookingCancellation(bookingId, userRole);
             return ResponseEntity.ok(bookingDTO);
         } catch (GeneralException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);

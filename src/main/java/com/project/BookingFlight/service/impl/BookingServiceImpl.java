@@ -40,28 +40,40 @@ public class BookingServiceImpl implements BookingService {
         return bookings.stream().map(bookingMapper::toDto).collect(Collectors.toList());
     }
 
-    public BookingDTO requestBookingCancellation(Long bookingId, String declineReason, UserRoleEnum userRole) {
+    @Override
+    public BookingDTO requestBookingCancellation(Long bookingId,  UserRoleEnum userRole) {
         Optional<Booking> existingBooking = bookingRepository.findById(bookingId);
         checkIfBookingExist(existingBooking);
         Booking booking = existingBooking.get();
 
-        if (booking.isCancelled()) {
+        if (booking.getIsCancelled()) {
             throw new GeneralException("Booking has already been cancelled.", Arrays.asList(existingBooking));
         }
         // Handle traveler's cancellation request
         if (userRole == UserRoleEnum.TRAVELLER) {
             // Update booking status to "Cancellation Requested"
-            booking.setCancelled(true);
-            booking.setCancellationReason(null);
+            booking.setAwaitingCancellation(true);
         }
         // Handle admin decline cancellation request
-        if (userRole == UserRoleEnum.ADMIN && declineReason != null && !declineReason.isEmpty()) {
-            // Update booking status to "Declined" and set the decline reason
-            booking.setCancelled(false);
-            booking.setCancellationReason(declineReason);
-        }
         bookingRepository.save(booking);
         return bookingMapper.toDto(booking);
+    }
+
+    @Override
+    public BookingDTO confirmBookingCancellation(Long bookingId, String declineReason, UserRoleEnum userRole){
+        Optional<Booking> existingBooking = bookingRepository.findById(bookingId);
+        checkIfBookingExist(existingBooking);
+        Booking booking = existingBooking.get();
+
+        if (userRole == UserRoleEnum.ADMIN && declineReason != null) {
+            // Update booking status to "Declined" and set the decline reason
+            booking.setIsCancelled(true);
+            booking.setCancellationReason(declineReason);
+            return bookingMapper.toDto(booking);
+        } else {
+            booking.setIsCancelled(false);
+            return bookingMapper.toDto(booking);
+        }
     }
 
     @Override

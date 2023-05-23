@@ -10,7 +10,9 @@ import com.project.BookingFlight.repository.FlightRepository;
 import com.project.BookingFlight.service.FlightService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -34,7 +36,8 @@ public class FlightServiceImpl implements FlightService {
     @Override
     public void deleteFlight(Long id) { // kontrolloje si method
         log.info("Fetching flight with id {} from DB" ,id);
-        Optional<Flight> flight = flightRepository.findById(id);
+        Flight flight = flightRepository.findById(id).orElseThrow(() -> new GeneralException());
+
         checkIfExist(flight);
         //checks if flights has bookings
            List<Booking> bookings = bookingRepository.findBookingByFlights(flight); // tek repo e (Optional<Flight> flight) ??????
@@ -74,9 +77,11 @@ public class FlightServiceImpl implements FlightService {
 
     @Override
     public FlightDTO updateFlight(Long id, Flight requestedFlight) {
-        Optional<Flight> existingFlight = flightRepository.findById(id);
-        checkIfExist(existingFlight);
-        Flight flight = existingFlight.get();
+        Flight existingFlight = flightRepository.findById(id).orElse(null);
+        Flight flight = new Flight();
+        if (checkIfExist(existingFlight)){
+             flight = existingFlight;
+        }
         log.info("Updating flight{}", flight.getFlightNumber());
 
         if (hasTravelerBookings(flight)) {
@@ -94,70 +99,76 @@ public class FlightServiceImpl implements FlightService {
                     throw new GeneralException("Flight number is already taken!",
                             Arrays.asList(requestedFlight.getFlightNumber()));
                 }
-                flight.setFlightNumber(requestedFlight.getFlightNumber());
             }
-            if (requestedFlight.getAirlineCode() != null) {
-                flight.setAirlineCode(requestedFlight.getAirlineCode());
-            }
-            if (requestedFlight.getOrigin() != null) {
-                flight.setOrigin(requestedFlight.getOrigin());
-            }
-            if (requestedFlight.getDestination() != null) {
-                flight.setDestination(requestedFlight.getDestination());
-            }
-            if (requestedFlight.getDepartureDate() != null) {
-                flight.setDepartureDate(requestedFlight.getDepartureDate());
-            }
-            if (requestedFlight.getArrivalDate() != null) {
-                flight.setArrivalDate(requestedFlight.getArrivalDate());
-            }
-            if (requestedFlight.getDepartureTime() != null) {
-                flight.setDepartureTime(requestedFlight.getDepartureTime());
-            }
-            if (requestedFlight.getArrivalTime() != null) {
-                flight.setArrivalTime(requestedFlight.getArrivalTime());
-            }
-            if (requestedFlight.getPrice() != null) {
-                flight.setPrice(requestedFlight.getPrice());
-            }
-            if (requestedFlight.getTotalEconomySeats() != null) {
-                flight.setTotalEconomySeats(requestedFlight.getTotalEconomySeats());
-            }
-            if (requestedFlight.getTotalPremiumEconomySeats() != null) {
-                flight.setTotalPremiumEconomySeats(requestedFlight.getTotalPremiumEconomySeats());
-            }
-            if (requestedFlight.getTotalBusinessSeats() != null) {
-                flight.setTotalBusinessSeats(requestedFlight.getTotalBusinessSeats());
-            }
-            if (requestedFlight.getTotalFirstClassSeats() != null) {
-                flight.setTotalFirstClassSeats(requestedFlight.getTotalFirstClassSeats());
-            }
-            if (requestedFlight.getAvailableEconomySeats() != null) {
-                flight.setAvailableEconomySeats(requestedFlight.getAvailableEconomySeats());
-            }
-            if (requestedFlight.getAvailablePremiumEconomySeats() != null) {
-                flight.setAvailablePremiumEconomySeats(requestedFlight.getAvailablePremiumEconomySeats());
-            }
-            if (requestedFlight.getAvailableBusinessSeats() != null) {
-                flight.setAvailableBusinessSeats(requestedFlight.getAvailableBusinessSeats());
-            }
-            if (requestedFlight.getAvailableFirstClassSeats() != null) {
-                flight.setAvailableFirstClassSeats(requestedFlight.getAvailableFirstClassSeats());
-            }
-            if (requestedFlight.getBookings() != null) {
-                flight.setBookings(requestedFlight.getBookings());
-            }
+
+              flight = requestedFlight;
+//            if (requestedFlight.getAirlineCode() != null) {
+//                flight.setAirlineCode(requestedFlight.getAirlineCode());
+//            }
+//            if (requestedFlight.getOrigin() != null) {
+//                flight.setOrigin(requestedFlight.getOrigin());
+//            }
+//            if (requestedFlight.getDestination() != null) {
+//                flight.setDestination(requestedFlight.getDestination());
+//            }
+//            if (requestedFlight.getDepartureDate() != null) {
+//                flight.setDepartureDate(requestedFlight.getDepartureDate());
+//            }
+//            if (requestedFlight.getArrivalDate() != null) {
+//                flight.setArrivalDate(requestedFlight.getArrivalDate());
+//            }
+//            if (requestedFlight.getDepartureTime() != null) {
+//                flight.setDepartureTime(requestedFlight.getDepartureTime());
+//            }
+//            if (requestedFlight.getArrivalTime() != null) {
+//                flight.setArrivalTime(requestedFlight.getArrivalTime());
+//            }
+//            if (requestedFlight.getPrice() != null) {
+//                flight.setPrice(requestedFlight.getPrice());
+//            }
+//            if (requestedFlight.getTotalEconomySeats() != null) {
+//                flight.setTotalEconomySeats(requestedFlight.getTotalEconomySeats());
+//            }
+//            if (requestedFlight.getTotalPremiumEconomySeats() != null) {
+//                flight.setTotalPremiumEconomySeats(requestedFlight.getTotalPremiumEconomySeats());
+//            }
+//            if (requestedFlight.getTotalBusinessSeats() != null) {
+//                flight.setTotalBusinessSeats(requestedFlight.getTotalBusinessSeats());
+//            }
+//            if (requestedFlight.getTotalFirstClassSeats() != null) {
+//                flight.setTotalFirstClassSeats(requestedFlight.getTotalFirstClassSeats());
+//            }
+//            if (requestedFlight.getAvailableEconomySeats() != null) {
+//                flight.setAvailableEconomySeats(requestedFlight.getAvailableEconomySeats());
+//            }
+//            if (requestedFlight.getAvailablePremiumEconomySeats() != null) {
+//                flight.setAvailablePremiumEconomySeats(requestedFlight.getAvailablePremiumEconomySeats());
+//            }
+//            if (requestedFlight.getAvailableBusinessSeats() != null) {
+//                flight.setAvailableBusinessSeats(requestedFlight.getAvailableBusinessSeats());
+//            }
+//            if (requestedFlight.getAvailableFirstClassSeats() != null) {
+//                flight.setAvailableFirstClassSeats(requestedFlight.getAvailableFirstClassSeats());
+//            }
+//            if (requestedFlight.getBookings() != null) {
+//                flight.setBookings(requestedFlight.getBookings());
+//            }
         }
-        flight = flightRepository.save(flight);
+        try {
+            flight = flightRepository.save(flight);
+        } catch (Exception e){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
         return flightMapper.toDto(flight);
     }
 
-    private void checkIfExist(Optional<Flight> flight) {
+    private boolean checkIfExist(Flight flight) {
         log.info("Checking if flight exists");
-        if (flight.isEmpty()) {
+        if (flight == null) {
             log.error("Flight not found");
             throw new GeneralException("Flight not found", null);
         }
+        return true;
     }
 
 

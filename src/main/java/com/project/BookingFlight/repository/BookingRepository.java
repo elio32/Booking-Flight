@@ -12,7 +12,7 @@ import java.util.Optional;
 
 public interface BookingRepository extends JpaRepository<Booking,Long> {
     List<Booking> findBookingsByUser(UserApp user);
-    List<Booking> findBookingByFlights(Optional<Flight> flight); //????
+    List<Booking> findBookingByFlights(Flight flight); //????
 
     List<Booking> findByFlights(Flight flight);
     Page<Booking> findByUserId(Long userId, Pageable pageable);//????
