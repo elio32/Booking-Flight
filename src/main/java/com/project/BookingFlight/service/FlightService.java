@@ -13,4 +13,5 @@ public interface FlightService {
     List<FlightDTO> findFlightByOriginOrDestinationOrDepartureDateOrAirlineCode(String origin, String destination,
                                                                           Date departureDate, String airlineCode);
     FlightDTO updateFlight(Long id, Flight requestedFlight);
+
 }

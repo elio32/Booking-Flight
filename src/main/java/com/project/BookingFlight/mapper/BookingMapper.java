@@ -32,7 +32,7 @@ public class BookingMapper extends AbstractMapper<Booking, BookingDTO>{
         log.info("Converting Booking to DTO");
         BookingDTO bookingDTO = new BookingDTO();
         bookingDTO.setId(booking.getId());
-        bookingDTO.setFlights(booking.getFlights());
+        bookingDTO.setBookingFlights(booking.getBookingFlights());
         bookingDTO.setIsCancelled(booking.getIsCancelled());
         bookingDTO.setAwaitingCancellation(booking.getAwaitingCancellation());
         bookingDTO.setCancellationReason(booking.getCancellationReason());

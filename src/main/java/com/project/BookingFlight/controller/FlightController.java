@@ -1,14 +1,17 @@
 package com.project.BookingFlight.controller;
 
+import com.project.BookingFlight.exception.GeneralException;
 import com.project.BookingFlight.model.dto.FlightDTO;
 import com.project.BookingFlight.model.entity.Flight;
 import com.project.BookingFlight.service.FlightService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -18,6 +21,12 @@ import java.util.List;
 public class FlightController {
 
     private final FlightService flightService;
+
+    @PreAuthorize(value = "hasAnyRole('ADMIN')")
+    @GetMapping("/getAllFlights")
+    public ResponseEntity<List<FlightDTO>> getAllFlights(){
+            return ResponseEntity.ok(flightService.getAllFlights());
+    }
 
     @PreAuthorize(value = "hasAnyRole('ADMIN')")
     @PostMapping("/create")
@@ -33,23 +42,27 @@ public class FlightController {
     @PreAuthorize(value = "hasAnyRole('ADMIN')")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<FlightDTO> deleteFlight(@PathVariable(value = "id") Long id){
-        flightService.deleteFlight(id);
-        return ResponseEntity.status(200).build();
+        try {
+            flightService.deleteFlight(id);
+            return ResponseEntity.status(200).build();
+        }catch (GeneralException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
     }
+
     @PreAuthorize(value = "hasAnyRole('TRAVELLER')")
+    @RequestMapping(method = RequestMethod.GET, value = "/search")
     public ResponseEntity<List<FlightDTO>> searchFlights(
-            @RequestParam(value = "origin", required = false) String origin,
-            @RequestParam(value = "destination", required = false) String destination,
-            @RequestParam(value = "departureDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date departureDate,
-            @RequestParam(value = "airlineCode", required = false) String airlineCode) {
-
-        List<FlightDTO> flights = flightService.findFlightByOriginOrDestinationOrDepartureDateOrAirlineCode(
-                origin, destination, departureDate, airlineCode);
-
-        if (flights.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.ok(flights);
+            @RequestParam String origin,
+            @RequestParam String destination,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date flightDate,
+            @RequestParam(required = false) String airlineCode
+    ) {
+        try {
+            List<FlightDTO> flights = flightService.findFlightByOriginOrDestinationOrDepartureDateOrAirlineCode(origin, destination, flightDate, airlineCode);
+            return new ResponseEntity<>(flights, HttpStatus.OK);
+        }catch (GeneralException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
 }

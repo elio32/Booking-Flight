@@ -17,7 +17,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -55,7 +54,7 @@ public class UserServiceImpl implements UserService {
         log.info("Updating user{}",user.getUsername());
         if(requestedUser.getUsername() != null) {
             if(userRepository.findByUsername(requestedUser.getUsername()).isPresent()) {
-                throw new GeneralException("Username is taken!", Arrays.asList(requestedUser.getUsername()));
+                throw new GeneralException("Username is taken!");
             }
             user.setUsername(requestedUser.getUsername());
         }
@@ -80,10 +79,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO saveUser(UserApp user) {
         log.info("Saving new user{} to DB",user.getUsername());
-        user.setPassword(encoder.encode(user.getPassword()));
-        user = userRepository.save(user);
-        return userMapper.toDto(user);
-
+            user.setPassword(encoder.encode(user.getPassword()));
+            user = userRepository.save(user);
+            return userMapper.toDto(user);
     }
 
     @Override
@@ -93,7 +91,7 @@ public class UserServiceImpl implements UserService {
         Optional<UserApp> user = userRepository.findById(id);
         if (user.isPresent()){
             userRepository.deleteById(id);
-        }else throw new GeneralException("User not found with id " + id,null);
+        }else throw new GeneralException("User not found with id " + id);
     }
 
     // Can view all travellers who have booked on a specific flight.
@@ -103,8 +101,8 @@ public class UserServiceImpl implements UserService {
         checkIfFlightExist(existingFlights);
         Flight flight = existingFlights.get();
 
-        List<UserApp> travellers = bookingRepository.findByFlights(flight)
-                .stream().map(Booking::getUser).collect(Collectors.toList());
+        List<UserApp> travellers = bookingRepository.findByBookingFlightsFlight(flight)
+                .stream().map(Booking::getUser).toList();
 
         return travellers.stream().map(userMapper::toDto).collect(Collectors.toList());
     }
@@ -113,10 +111,10 @@ public class UserServiceImpl implements UserService {
 
         log.info("Checking if Username or Email exist");
         if (userRepository.findByUsername(userDTO.getUsername()).isPresent()) {
-            throw new GeneralException("Username already exists",null);
+            throw new GeneralException("Username already exists");
         }
         if (userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
-            throw new GeneralException("Email already exists",null);
+            throw new GeneralException("Email already exists");
         }
 
         log.info("Creating new user");
@@ -142,7 +140,7 @@ public class UserServiceImpl implements UserService {
             log.error("User not found");
             else
                 log.error("User is not enabled");
-            throw new GeneralException("User not found", null);
+            throw new GeneralException("User not found");
         }
     }
 
@@ -151,7 +149,7 @@ public class UserServiceImpl implements UserService {
         log.info("Checking if flight exists");
         if (flight.isEmpty()) {
             log.error("Flight not found");
-            throw new GeneralException("Flight not found", null);
+            throw new GeneralException("Flight not found");
         }
     }
 }

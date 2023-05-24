@@ -8,13 +8,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface BookingRepository extends JpaRepository<Booking,Long> {
     List<Booking> findBookingsByUser(UserApp user);
-    List<Booking> findBookingByFlights(Flight flight); //????
-
-    List<Booking> findByFlights(Flight flight);
+    List<Booking> findBookingByBookingFlightsFlight(Flight flight); //????
+    List<Booking> findByBookingFlightsFlight(Flight flight);
     Page<Booking> findByUserId(Long userId, Pageable pageable);//????
 
 }

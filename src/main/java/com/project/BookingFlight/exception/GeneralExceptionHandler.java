@@ -1,23 +1,22 @@
 package com.project.BookingFlight.exception;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import com.project.BookingFlight.model.dto.BaseResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import java.io.IOException;
+import java.util.List;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @ControllerAdvice @Slf4j
-public class GeneralExceptionHandler {
-    public void commence(HttpServletRequest request, HttpServletResponse response, GeneralException exception)
-            throws IOException {
-
-//        log.error("General Exception!");
-//        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-//        response.setContentType(APPLICATION_JSON_VALUE);
-//        new ObjectMapper().writeValue(response.getOutputStream());
+public class GeneralExceptionHandler extends ResponseEntityExceptionHandler {
+    @ExceptionHandler(value = GeneralException.class)
+    public ResponseEntity<BaseResponse> handeGeneralException(GeneralException e){
+        log.info("General Exception");
+        BaseResponse baseResponse = new BaseResponse();
+        baseResponse.setMessages(List.of("Bad Request"));
+        return ResponseEntity.status(403).body(baseResponse);
     }
 }
