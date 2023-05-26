@@ -11,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -25,19 +24,38 @@ public class FlightController {
     @PreAuthorize(value = "hasAnyRole('ADMIN')")
     @GetMapping("/getAllFlights")
     public ResponseEntity<List<FlightDTO>> getAllFlights(){
+        try {
             return ResponseEntity.ok(flightService.getAllFlights());
+        }catch (GeneralException e){
+            e.printStackTrace();
+            System.err.println("Error: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
     }
 
     @PreAuthorize(value = "hasAnyRole('ADMIN')")
     @PostMapping("/create")
     public ResponseEntity<FlightDTO> createFlight(@RequestBody Flight flight){
-        return ResponseEntity.ok(flightService.saveNewFlight(flight));
+        try {
+            return ResponseEntity.ok(flightService.saveNewFlight(flight));
+        }catch (GeneralException e){
+            e.printStackTrace();
+            System.err.println("Error: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
     }
     @PreAuthorize(value = "hasAnyRole('ADMIN')")
     @PutMapping("/update/{id}")
     public ResponseEntity<FlightDTO> updateFlight(@PathVariable(value = "id") Long id, @RequestBody Flight flight){
-        flightService.updateFlight(id, flight);
-        return ResponseEntity.status(200).build();
+        try {
+            flightService.updateFlight(id, flight);
+            return ResponseEntity.status(200).build();
+        }catch (GeneralException e){
+            e.printStackTrace();
+            System.err.println("Error: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+
+        }
     }
     @PreAuthorize(value = "hasAnyRole('ADMIN')")
     @DeleteMapping("/delete/{id}")
@@ -46,12 +64,14 @@ public class FlightController {
             flightService.deleteFlight(id);
             return ResponseEntity.status(200).build();
         }catch (GeneralException e){
+            e.printStackTrace();
+            System.err.println("Error: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
 
     @PreAuthorize(value = "hasAnyRole('TRAVELLER')")
-    @RequestMapping(method = RequestMethod.GET, value = "/search")
+    @GetMapping("/search")
     public ResponseEntity<List<FlightDTO>> searchFlights(
             @RequestParam String origin,
             @RequestParam String destination,
@@ -59,9 +79,12 @@ public class FlightController {
             @RequestParam(required = false) String airlineCode
     ) {
         try {
-            List<FlightDTO> flights = flightService.findFlightByOriginOrDestinationOrDepartureDateOrAirlineCode(origin, destination, flightDate, airlineCode);
-            return new ResponseEntity<>(flights, HttpStatus.OK);
+            List<FlightDTO> flights = flightService.findFlightByOriginOrDestinationOrDepartureDateOrAirlineCode
+                    (origin, destination, flightDate, airlineCode);
+            return  ResponseEntity.ok(flights);
         }catch (GeneralException e){
+            e.printStackTrace();
+            System.err.println("Error: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }

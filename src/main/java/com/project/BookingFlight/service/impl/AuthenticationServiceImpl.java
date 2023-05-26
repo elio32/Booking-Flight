@@ -25,10 +25,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 
     @Override
-    public AuthenticationResponse authenticate(AuthenticationRequest authenticationRequest) throws AuthenticationException {
+    public AuthenticationResponse authenticate(AuthenticationRequest authenticationRequest)
+            throws AuthenticationException {
         final AuthenticationResponse authenticationResponse = new AuthenticationResponse();
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authenticationRequest.getEmail(), authenticationRequest.getPassword()));
-        authenticationResponse.setToken(tokenService.generateToken(userDetailsService.loadUserByUsername(authenticationRequest.getEmail())));
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authenticationRequest.
+                getEmail(), authenticationRequest.getPassword()));
+        authenticationResponse.setToken(tokenService.generateToken(userDetailsService.
+                loadUserByUsername(authenticationRequest.getEmail())));
         return authenticationResponse;
     }
 }

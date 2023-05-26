@@ -135,7 +135,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private void checkIfUserExist(Optional<UserApp> user) {
-        if (user.isEmpty() || !user.get().isEnabled()) { //isEnabled ?
+        if (user.isEmpty() || !user.get().isEnabled()) {
             if (user.isEmpty())
             log.error("User not found");
             else
@@ -143,7 +143,6 @@ public class UserServiceImpl implements UserService {
             throw new GeneralException("User not found");
         }
     }
-
 
     private void checkIfFlightExist(Optional<Flight> flight) {
         log.info("Checking if flight exists");

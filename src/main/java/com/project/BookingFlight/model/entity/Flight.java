@@ -56,7 +56,10 @@ public class Flight {
     @OneToMany(mappedBy = "flight",cascade = CascadeType.ALL)
     private List<BookingFlight> bookingFlights;
 
-    public Flight(String airlineCode, String flightNumber, String origin, String destination, Date departureDate, Date arrivalDate, LocalTime departureTime, LocalTime arrivalTime, Double price, Integer totalEconomySeats, Integer totalPremiumEconomySeats, Integer totalBusinessSeats, Integer totalFirstClassSeats, List<BookingFlight> bookingFlights) {
+    public Flight(String airlineCode, String flightNumber, String origin, String destination, Date departureDate,
+                  Date arrivalDate, LocalTime departureTime, LocalTime arrivalTime, Double price,
+                  Integer totalEconomySeats, Integer totalPremiumEconomySeats, Integer totalBusinessSeats,
+                  Integer totalFirstClassSeats, List<BookingFlight> bookingFlights) {
         this.airlineCode = airlineCode;
         this.flightNumber = flightNumber;
         this.origin = origin;

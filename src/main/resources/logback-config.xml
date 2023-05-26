@@ -17,7 +17,7 @@
     </appender>
 
     <root level="WARN"/>
-    <logger name="com.lhind.internship.springbootfirstprogram.SpringBootApp" level="INFO">
+    <logger name="com.project.BookingFlight" level="INFO">
         <appender-ref ref="FILE_APPENDER"/>
     </logger>
 

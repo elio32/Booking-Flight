@@ -25,7 +25,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class BookingServiceImpl implements BookingService {
     private final FlightRepository flightRepository;
-
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
     private final BookingMapper bookingMapper;
@@ -47,7 +46,6 @@ public class BookingServiceImpl implements BookingService {
         if (booking.getIsCancelled()) {
             throw new GeneralException("Booking has already been cancelled.");
         }
-        // Handle traveler's cancellation request
         booking.setAwaitingCancellation(true);
 
         bookingRepository.save(booking);
@@ -59,6 +57,10 @@ public class BookingServiceImpl implements BookingService {
         Optional<Booking> existingBooking = bookingRepository.findById(bookingId);
         checkIfBookingExist(existingBooking);
         Booking booking = existingBooking.get();
+
+        if (booking.getIsCancelled()) {
+            throw new GeneralException("Booking is already cancelled.");
+        }
 
         if (declineReason != null) {
             // Update booking status to "Declined" and set the decline reason
@@ -75,52 +77,62 @@ public class BookingServiceImpl implements BookingService {
         if(pagination == null) pagination = new Pagination();
         log.info("Fetching all Users with {}", pagination);
         Pageable pageable = PageRequest.of(pagination.getPageNumber(), pagination.getPageSize(),
-                pagination.getSortByAscendingOrder() ? Sort.by("flight.departureDate").ascending()
-                        : Sort.by("flight.departureDate").descending());
+                pagination.getSortByAscendingOrder() ? Sort.by(pagination.getSortByProperty()).ascending()
+                        : Sort.by(pagination.getSortByProperty()).descending());
         Page<Booking> bookingPage = bookingRepository.findByUserId(userId,pageable);
         return bookingPage.stream().map(bookingMapper::toDto).collect(Collectors.toList());
     }
 
-    @Override // shife se se di a eshte e sakte apo jo
-    public BookingDTO createBooking(Long flightId, BookingClassesEnum bookingClass) {
+    @Override
+    public BookingDTO createBooking(Booking booking, String email) {
         // Check if at least one flight is included in the booking
-        if (flightId == null) {
+        if (booking.getBookingFlights() == null || booking.getBookingFlights().size() < 1) {
             throw new GeneralException("At least one flight should be included in the booking.");
         }
 
-        // Retrieve the Flight object from the database
-        Flight flight = flightRepository.findById(flightId)
-                .orElseThrow(() -> new GeneralException("Flight with ID " + flightId + " does not exist."));
+        UserApp user =userRepository.findByEmail(email).
+                orElseThrow(() -> new GeneralException("No user found with email: " + email));
 
-        // Check if the flight has already departed
-        Date currentDate = new Date();
-        if (flight.getDepartureDate().before(currentDate)) {
-            throw new GeneralException("Flight " + flight.getFlightNumber() + " has already departed.");
+        booking.setUser(user);
+
+        for (BookingFlight bookingFlight : booking.getBookingFlights()) {
+            // Retrieve the Flight object from the database
+            Optional<Flight> flight = flightRepository.findById(bookingFlight.getFlight().getId());
+            if (flight.isEmpty()) {
+                throw new GeneralException("Flight with ID " + bookingFlight.getId() + " does not exist.");
+            }
+            // Check if the flight has already departed
+            else if (flight.get().getDepartureDate().before(new Date())){
+                throw new GeneralException("Flight " + flight.get().getFlightNumber() + " has already departed.");
+            }
+
+            // Check if there are enough seats available in the requested booking class
+            int availableSeats = getAvailableSeats(flight.get(), bookingFlight.getBookingClass());
+            if (availableSeats <= 0) {
+                throw new GeneralException("Not enough seats available in the requested booking class for flight "
+                        + flight.get().getFlightNumber());
+            } else {
+                int availableClassSeats = getAvailableSeats(flight.get(), bookingFlight.getBookingClass());
+                if (availableClassSeats <= 0) {
+                    throw new GeneralException("Not enough seats available in the requested booking class for flight "
+                            + flight.get().getFlightNumber());
+                } else {
+                    // Decrease the available seats count by 1 for the requested booking class
+                    decreaseAvailableSeats(flight.get(), bookingFlight.getBookingClass());
+                }
+
+                bookingFlight.setBooking(booking);
+            }
+            bookingFlight.setBooking(booking);
         }
-
-        // Check if there are enough seats available in the requested booking class
-        int availableSeats = getAvailableSeats(flight, bookingClass);
-        if (availableSeats <= 0) {
-            throw new GeneralException("Not enough seats available in the requested booking class for flight " + flight.getFlightNumber());
-        }
-
         // Create the booking
-        Booking booking = new Booking();
         booking.setIsCancelled(false);
         booking.setAwaitingCancellation(false);
         booking.setCancellationReason(null);
-        booking.setBookingFlights(new ArrayList<>());
 
-        // Create booking flight
-        BookingFlight bookingFlight = new BookingFlight();
-        bookingFlight.setBooking(booking);
-        bookingFlight.setFlight(flight);
-        bookingFlight.setBookingClass(bookingClass);
-
-        booking.getBookingFlights().add(bookingFlight);
-
-        Booking createdBooking = bookingRepository.save(booking);
-        return bookingMapper.toDto(createdBooking);
+        booking = bookingRepository.save(booking);
+        Booking returnedBooking = bookingRepository.findById(booking.getId()).get();
+        return bookingMapper.toDto(returnedBooking);
     }
 
     private int getAvailableSeats(Flight flight, BookingClassesEnum bookingClass) {
@@ -138,6 +150,53 @@ public class BookingServiceImpl implements BookingService {
         }
     }
 
+    private void decreaseAvailableSeats(Flight flight, BookingClassesEnum bookingClass) {
+        List<BookingFlight> bookingFlights = flight.getBookingFlights();
+
+        for (BookingFlight bookingFlight : bookingFlights) {
+            if (bookingFlight.getBookingClass().equals(bookingClass)) {
+                int availableSeats = 0;
+
+                switch (bookingClass) {
+                    case BUSINESS:
+                        availableSeats = flight.getAvailableBusinessSeats();
+                        if (availableSeats > 0) {
+                            flight.setAvailableBusinessSeats(availableSeats - 1);
+                        }
+                        break;
+                    case ECONOMY:
+                        availableSeats = flight.getAvailableEconomySeats();
+                        if (availableSeats > 0) {
+                            flight.setAvailableEconomySeats(availableSeats - 1);
+                        }
+                        break;
+                    case FIRST:
+                        availableSeats = flight.getAvailableFirstClassSeats();
+                        if (availableSeats > 0) {
+                            flight.setAvailableFirstClassSeats(availableSeats - 1);
+                        }
+                        break;
+                    case PREMIUM_ECONOMY:
+                        availableSeats = flight.getAvailablePremiumEconomySeats();
+                        if (availableSeats > 0) {
+                            flight.setAvailablePremiumEconomySeats(availableSeats - 1);
+                        }
+                        break;
+                    default:
+                        throw new GeneralException("Invalid booking class: " + bookingClass);
+                }
+
+                if (availableSeats <= 0) {
+                    throw new GeneralException("Not enough available seats in the requested booking class for flight: "
+                            + flight.getFlightNumber());
+                }
+
+                flightRepository.save(flight);
+                break;
+            }
+        }
+    }
+
 
     private void checkIfBookingExist(Optional<Booking> booking) {
         log.info("Checking if booking exists");
@@ -146,7 +205,7 @@ public class BookingServiceImpl implements BookingService {
             throw new GeneralException("Booking not found");
         }
     }
-    // se di a duhet ta bej checkIfUserExist ktu
+
     private void checkIfUserExist(Optional<UserApp> user) {
         if (user.isEmpty() || !user.get().isEnabled()) {
             if (user.isEmpty())

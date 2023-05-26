@@ -27,7 +27,8 @@ public class TokenServiceImpl implements TokenService {
     @Override
     public String generateToken(UserDetails userDetails) {
         final Map<String, Object> claims = new HashMap<>();
-        claims.put(ClaimIdentifier.AUTHORITIES.name(), userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()));
+        claims.put(ClaimIdentifier.AUTHORITIES.name(), userDetails.getAuthorities().stream().
+                map(GrantedAuthority::getAuthority).collect(Collectors.toList()));
         return createToken(claims, userDetails.getUsername());
     }
 

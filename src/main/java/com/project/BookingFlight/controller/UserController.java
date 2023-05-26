@@ -24,6 +24,8 @@ public class UserController {
         try {
             return ResponseEntity.ok(userService.getAllUsers());
         }catch (GeneralException e){
+            e.printStackTrace();
+            System.err.println("Error: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
@@ -34,6 +36,8 @@ public class UserController {
         try {
             return ResponseEntity.ok(userService.saveUser(user));
         }catch (GeneralException e){
+            e.printStackTrace();
+            System.err.println("Error: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
@@ -44,6 +48,8 @@ public class UserController {
             userService.deleteUser(userId);
             return ResponseEntity.status(200).build();
         }catch (GeneralException e){
+            e.printStackTrace();
+            System.err.println("Error: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
@@ -55,6 +61,8 @@ public class UserController {
             userService.updateUser(id, user);
             return ResponseEntity.status(200).build();
         }catch (GeneralException e){
+            e.printStackTrace();
+            System.err.println("Error: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
@@ -65,6 +73,8 @@ public class UserController {
         try {
             return ResponseEntity.ok(userService.getUserByEmail(email));
         }catch (GeneralException e){
+            e.printStackTrace();
+            System.err.println("Error: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
@@ -75,6 +85,8 @@ public class UserController {
         try {
             return ResponseEntity.ok(userService.getAllTravellersByFlight(flightId));
         } catch (GeneralException e){
+            e.printStackTrace();
+            System.err.println("Error: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }

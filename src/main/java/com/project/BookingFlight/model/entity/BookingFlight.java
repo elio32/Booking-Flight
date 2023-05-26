@@ -1,5 +1,6 @@
 package com.project.BookingFlight.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.project.BookingFlight.model.enums.BookingClassesEnum;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -17,6 +18,7 @@ public class BookingFlight {
     private Long id;
     @ManyToOne
     @JoinColumn(name = "booking_id", nullable = false)
+    @JsonIgnore
     private Booking booking;
     @ManyToOne
     @JoinColumn(name = "flight_id", nullable = false)
