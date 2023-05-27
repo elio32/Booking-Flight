@@ -53,22 +53,34 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public BookingDTO confirmBookingCancellation(Long bookingId, String declineReason){
+    public BookingDTO confirmBookingCancellation(Long bookingId, BookingDTO bookingDTO) {
         Optional<Booking> existingBooking = bookingRepository.findById(bookingId);
         checkIfBookingExist(existingBooking);
         Booking booking = existingBooking.get();
 
-        if (booking.getIsCancelled()) {
+        if (bookingDTO.getIsCancelled() && booking.getIsCancelled()) {
             throw new GeneralException("Booking is already cancelled.");
         }
 
-        if (declineReason != null) {
-            // Update booking status to "Declined" and set the decline reason
-            booking.setIsCancelled(true);
-            booking.setCancellationReason(declineReason);
-        } else {
-            booking.setIsCancelled(false);
+        if (bookingDTO.getIsCancelled() != null) {
+            // Update booking status to "Cancelled" if isCancelled is true
+            booking.setIsCancelled(bookingDTO.getIsCancelled());
+
+            if (bookingDTO.getIsCancelled() && booking.getAwaitingCancellation()) {
+                // Admin approves the cancellation request
+                booking.setAwaitingCancellation(false);
+
+                // Set cancellation reason to null if isCancelled is true
+                booking.setCancellationReason(null);
+            } else if (!bookingDTO.getIsCancelled() && booking.getIsCancelled()) {
+                // Admin changes the cancellation request from declined to accepted
+                booking.setCancellationReason(null);
+            }
         }
+
+        // Save the updated booking in the database
+        booking = bookingRepository.save(booking);
+
         return bookingMapper.toDto(booking);
     }
 
@@ -85,7 +97,6 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingDTO createBooking(Booking booking, String email) {
-        // Check if at least one flight is included in the booking
         if (booking.getBookingFlights() == null || booking.getBookingFlights().size() < 1) {
             throw new GeneralException("At least one flight should be included in the booking.");
         }
@@ -96,7 +107,6 @@ public class BookingServiceImpl implements BookingService {
         booking.setUser(user);
 
         for (BookingFlight bookingFlight : booking.getBookingFlights()) {
-            // Retrieve the Flight object from the database
             Optional<Flight> flight = flightRepository.findById(bookingFlight.getFlight().getId());
             if (flight.isEmpty()) {
                 throw new GeneralException("Flight with ID " + bookingFlight.getId() + " does not exist.");
@@ -158,32 +168,31 @@ public class BookingServiceImpl implements BookingService {
                 int availableSeats = 0;
 
                 switch (bookingClass) {
-                    case BUSINESS:
+                    case BUSINESS -> {
                         availableSeats = flight.getAvailableBusinessSeats();
                         if (availableSeats > 0) {
                             flight.setAvailableBusinessSeats(availableSeats - 1);
                         }
-                        break;
-                    case ECONOMY:
+                    }
+                    case ECONOMY -> {
                         availableSeats = flight.getAvailableEconomySeats();
                         if (availableSeats > 0) {
                             flight.setAvailableEconomySeats(availableSeats - 1);
                         }
-                        break;
-                    case FIRST:
+                    }
+                    case FIRST -> {
                         availableSeats = flight.getAvailableFirstClassSeats();
                         if (availableSeats > 0) {
                             flight.setAvailableFirstClassSeats(availableSeats - 1);
                         }
-                        break;
-                    case PREMIUM_ECONOMY:
+                    }
+                    case PREMIUM_ECONOMY -> {
                         availableSeats = flight.getAvailablePremiumEconomySeats();
                         if (availableSeats > 0) {
                             flight.setAvailablePremiumEconomySeats(availableSeats - 1);
                         }
-                        break;
-                    default:
-                        throw new GeneralException("Invalid booking class: " + bookingClass);
+                    }
+                    default -> throw new GeneralException("Invalid booking class: " + bookingClass);
                 }
 
                 if (availableSeats <= 0) {

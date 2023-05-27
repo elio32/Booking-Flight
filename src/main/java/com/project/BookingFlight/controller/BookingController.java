@@ -51,10 +51,10 @@ public class BookingController {
     @PutMapping("/{bookingId}/confirm")
     public ResponseEntity<BookingDTO> confirmBookingCancellation(
             @PathVariable("bookingId") Long bookingId,
-            @RequestParam(value = "declineReason", required = false) String declineReason) {
+            @RequestBody(required = false) BookingDTO bookingDTO) {
         try {
-            BookingDTO bookingDTO = bookingService.confirmBookingCancellation(bookingId, declineReason);
-            return ResponseEntity.ok(bookingDTO);
+            BookingDTO updatedBooking = bookingService.confirmBookingCancellation(bookingId, bookingDTO);
+            return ResponseEntity.ok(updatedBooking);
         } catch (GeneralException e) {
             e.printStackTrace();
             System.err.println("Error: " + e.getMessage());

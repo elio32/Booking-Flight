@@ -10,6 +10,6 @@ public interface BookingService {
     List<BookingDTO> getAllBookingsByTraveller(Long travellerId);
     BookingDTO requestBookingCancellation(Long bookingId);
     List<BookingDTO> getUserBookings(Long userId, Pagination pagination);
-    BookingDTO confirmBookingCancellation(Long bookingId, String declineReason);
+    BookingDTO confirmBookingCancellation(Long bookingId, BookingDTO bookingDTO);
     BookingDTO createBooking(Booking booking, String email);
 }
