@@ -91,12 +91,20 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<BookingDTO> getUserBookings(Long userId, Pagination pagination) {
-        if(pagination == null) pagination = new Pagination();
-        log.info("Fetching all Users with {}", pagination);
+        if (userId == null) {
+            log.error("User ID is required.");
+            throw new GeneralException("User ID is required.");
+        }
+
+        if (pagination == null) {
+            pagination = new Pagination();
+        }
+
+        log.info("Fetching all bookings for user with ID {} with pagination {}", userId, pagination);
         Pageable pageable = PageRequest.of(pagination.getPageNumber(), pagination.getPageSize(),
                 pagination.getSortByAscendingOrder() ? Sort.by(pagination.getSortByProperty()).ascending()
                         : Sort.by(pagination.getSortByProperty()).descending());
-        Page<Booking> bookingPage = bookingRepository.findByUserId(userId,pageable);
+        Page<Booking> bookingPage = bookingRepository.findByUserId(userId, pageable);
         return bookingPage.stream().map(bookingMapper::toDto).collect(Collectors.toList());
     }
 

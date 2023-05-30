@@ -34,7 +34,7 @@ public class FlightServiceImpl implements FlightService {
     public void deleteFlight(Long id) {
         log.info("Fetching flight with id {} from DB" ,id);
         Flight flight = flightRepository.findById(id).
-                orElseThrow(() -> new GeneralException("Flight with this id doesnt exist" + id));
+                orElseThrow(() -> new GeneralException("Flight with this id doesn't exist " + id));
 
         checkIfExist(Optional.ofNullable(flight));
         //checks if flights has bookings
@@ -64,6 +64,9 @@ public class FlightServiceImpl implements FlightService {
                                                                                        Date departureDate, String airlineCode) {
         log.info("Searching for a flight by Origin {} or Destination {} or " +
                 "Departure Date {} or Airline Code {}",origin,destination,departureDate,airlineCode);
+        if (origin == null || destination == null || departureDate == null) {
+            throw new GeneralException("Enter the correct information for Origin, destination, and departure date.");
+        }
         Date currentDate = new Date();
         if (departureDate.before(currentDate)) {
             throw new GeneralException("Flight date cannot be in the past");

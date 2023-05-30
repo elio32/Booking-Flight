@@ -35,7 +35,7 @@ public class BookingController {
     }
 
     @PreAuthorize(value = "hasAnyRole('TRAVELLER')")
-    @PostMapping("/{bookingId}/cancel") // se di sa e sakt eshte
+    @PostMapping("/{bookingId}/cancel")
     public ResponseEntity<BookingDTO> requestBookingCancellation(@PathVariable(value = "bookingId") Long bookingId) {
         try {
             BookingDTO bookingDTO = bookingService.requestBookingCancellation(bookingId);
