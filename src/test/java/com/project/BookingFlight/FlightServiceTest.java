@@ -49,8 +49,5 @@ public class FlightServiceTest {
 
         assertNotNull(savedFlightDTO);
         assertEquals(flightDTO, savedFlightDTO);
-//        verify(flightRepository, times(1)).findByFlightNumber(flightDTO.getFlightNumber());
-//        verify(flightMapper, times(1)).toDto(flight);
-//        verify(flightRepository, times(1)).save(flight);
     }
 }

@@ -56,28 +56,4 @@ public class Flight {
     @OneToMany(mappedBy = "flight",cascade = CascadeType.ALL)
     private List<BookingFlight> bookingFlights;
 
-    public Flight(String airlineCode, String flightNumber, String origin, String destination, Date departureDate,
-                  Date arrivalDate, LocalTime departureTime, LocalTime arrivalTime, Double price,
-                  Integer totalEconomySeats, Integer totalPremiumEconomySeats, Integer totalBusinessSeats,
-                  Integer totalFirstClassSeats, List<BookingFlight> bookingFlights) {
-        this.airlineCode = airlineCode;
-        this.flightNumber = flightNumber;
-        this.origin = origin;
-        this.destination = destination;
-        this.departureDate = departureDate;
-        this.arrivalDate = arrivalDate;
-        this.departureTime = departureTime;
-        this.arrivalTime = arrivalTime;
-        this.price = price;
-        this.totalEconomySeats = totalEconomySeats;
-        this.totalPremiumEconomySeats = totalPremiumEconomySeats;
-        this.totalBusinessSeats = totalBusinessSeats;
-        this.totalFirstClassSeats = totalFirstClassSeats;
-        this.availableEconomySeats = totalEconomySeats;
-        this.availablePremiumEconomySeats = totalPremiumEconomySeats;
-        this.availableBusinessSeats = totalBusinessSeats;
-        this.availableFirstClassSeats = totalFirstClassSeats;
-        this.bookingFlights = bookingFlights;
-    }
-
 }

@@ -17,6 +17,6 @@ public class GeneralExceptionHandler extends ResponseEntityExceptionHandler {
         log.info("General Exception");
         BaseResponse baseResponse = new BaseResponse();
         baseResponse.setMessages(List.of("Bad Request"));
-        return ResponseEntity.status(403).body(baseResponse);
+        return ResponseEntity.status(400).body(baseResponse);
     }
 }

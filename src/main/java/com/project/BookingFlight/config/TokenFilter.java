@@ -35,7 +35,7 @@ public class TokenFilter extends OncePerRequestFilter {
         final String authorizationHeader = request.getHeader("Authorization");
         final String email;
         final String token;
-        //check if header is null and Bearer token to not execute the rest of code
+
         if (authorizationHeader == null ||!authorizationHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
@@ -44,14 +44,13 @@ public class TokenFilter extends OncePerRequestFilter {
         token = authorizationHeader.substring(7);
         email = tokenService.extractEmail(token);
 
-        //if user is not connected
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             final UserDetails userDetails = userDetailsService.loadUserByUsername(email);
             if (tokenService.validateToken(token, userDetails)) {
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authenticationToken);//update user token
+                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }
         }
         filterChain.doFilter(request, response);

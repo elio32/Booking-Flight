@@ -80,7 +80,7 @@ public class BookingServiceImpl implements BookingService {
                 booking.setCancellationReason(null);
             } else if (!bookingDTO.getIsCancelled() && booking.getIsCancelled()) {
                 // Admin changes the cancellation request from declined to accepted
-                booking.setCancellationReason(null);
+                booking.setCancellationReason(bookingDTO.getCancellationReason());
             }
         }
         log.info("Saving updated booking with ID {} to DB", bookingId);
@@ -142,16 +142,8 @@ public class BookingServiceImpl implements BookingService {
                 throw new GeneralException("Not enough seats available in the requested booking class for flight "
                         + flight.get().getFlightNumber());
             } else {
-                int availableClassSeats = getAvailableSeats(flight.get(), bookingFlight.getBookingClass());
-                if (availableClassSeats <= 0) {
-                    log.error("Not enough seats available in the requested booking class for flight {}",
-                            flight.get().getFlightNumber());
-                    throw new GeneralException("Not enough seats available in the requested booking class for flight "
-                            + flight.get().getFlightNumber());
-                } else {
                     // Decrease the available seats count by 1 for the requested booking class
                     decreaseAvailableSeats(flight.get(), bookingFlight.getBookingClass());
-                }
 
                 bookingFlight.setBooking(booking);
             }
