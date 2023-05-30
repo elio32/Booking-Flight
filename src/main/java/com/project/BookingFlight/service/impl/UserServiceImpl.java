@@ -107,6 +107,7 @@ public class UserServiceImpl implements UserService {
         return travellers.stream().map(userMapper::toDto).collect(Collectors.toList());
     }
 
+    @Override
     public UserDTO register(UserDTO userDTO) {
 
         log.info("Checking if Username or Email exist");
@@ -118,7 +119,6 @@ public class UserServiceImpl implements UserService {
         }
 
         log.info("Creating new user");
-        // Create a new UserApp entity
         UserApp user = new UserApp();
         user.setUsername(userDTO.getUsername());
         user.setPassword(encoder.encode(userDTO.getPassword()));

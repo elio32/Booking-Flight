@@ -59,7 +59,7 @@ public class FlightServiceImpl implements FlightService {
         return flightMapper.toDto(flight);
     }
 
-    @Override// kontrolloje
+    @Override
     public List<FlightDTO> findFlightByOriginOrDestinationOrDepartureDateOrAirlineCode(String origin, String destination,
                                                                                        Date departureDate, String airlineCode) {
         log.info("Searching for a flight by Origin {} or Destination {} or " +
@@ -80,7 +80,7 @@ public class FlightServiceImpl implements FlightService {
         }
     }
 
-    @Override // ben update flighted qe nuk jan ber booked, por ato qe jan ber booked nuk i ndryshon, por sme jep error, me jep status 200.
+    @Override
     public FlightDTO updateFlight(Long id, Flight requestedFlight) {
         Flight existingFlight = flightRepository.findById(id).orElseThrow(() -> new GeneralException("Flight not found"));
         log.info("Updating flight {}", existingFlight.getFlightNumber());
@@ -114,6 +114,7 @@ public class FlightServiceImpl implements FlightService {
             existingFlight.setBookingFlights(requestedFlight.getBookingFlights());
         }
 
+        log.info("Saving the updated flight in the DB");
         Flight updatedFlight = flightRepository.save(existingFlight);
         return flightMapper.toDto(updatedFlight);
     }

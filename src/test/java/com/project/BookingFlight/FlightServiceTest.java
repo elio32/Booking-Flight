@@ -1,5 +1,7 @@
 package com.project.BookingFlight;
 
+import com.project.BookingFlight.mapper.FlightMapper;
+import com.project.BookingFlight.model.dto.FlightDTO;
 import com.project.BookingFlight.model.entity.Flight;
 import com.project.BookingFlight.repository.FlightRepository;
 import com.project.BookingFlight.service.impl.FlightServiceImpl;
@@ -9,13 +11,19 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class FlightServiceTest {
+
     @Mock
     private FlightRepository flightRepository;
+
+    @Mock
+    private FlightMapper flightMapper;
 
     @InjectMocks
     private FlightServiceImpl flightService;
@@ -26,17 +34,23 @@ public class FlightServiceTest {
     }
 
     @Test
-    public void testDeleteFlight_WhenFlightExists_ShouldDeleteFlight() {
-        long flightId = 1L;
+    public void testSaveNewFlight_WhenFlightNumberIsUnique_ShouldSaveFlight() {
+
+        FlightDTO flightDTO = new FlightDTO();
+        flightDTO.setFlightNumber("AA200");
         Flight flight = new Flight();
-        flight.setId(flightId);
+        flight.setFlightNumber(flightDTO.getFlightNumber());
 
-        // Set up mock behavior
-        when(flightRepository.findById(flightId)).thenReturn(Optional.of(flight));
+        when(flightRepository.findByFlightNumber(flightDTO.getFlightNumber())).thenReturn(Optional.empty());
+        when(flightMapper.toDto(flight)).thenReturn(flightDTO);
+        when(flightRepository.save(flight)).thenReturn(flight);
 
-        flightService.deleteFlight(flightId);
+        FlightDTO savedFlightDTO = flightService.saveNewFlight(flight);
 
-        // Verify that the flight has been deleted
-        verify(flightRepository, times(1)).deleteById(flightId);
+        assertNotNull(savedFlightDTO);
+        assertEquals(flightDTO, savedFlightDTO);
+//        verify(flightRepository, times(1)).findByFlightNumber(flightDTO.getFlightNumber());
+//        verify(flightMapper, times(1)).toDto(flight);
+//        verify(flightRepository, times(1)).save(flight);
     }
 }

@@ -39,26 +39,32 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingDTO requestBookingCancellation(Long bookingId) {
+        log.info("Fetching booking with ID {} from DB", bookingId);
         Optional<Booking> existingBooking = bookingRepository.findById(bookingId);
         checkIfBookingExist(existingBooking);
         Booking booking = existingBooking.get();
 
         if (booking.getIsCancelled()) {
+            log.error("Booking with ID {} is already cancelled", bookingId);
             throw new GeneralException("Booking has already been cancelled.");
         }
         booking.setAwaitingCancellation(true);
 
+        log.info("Saving booking with ID {} as awaiting cancellation", bookingId);
         bookingRepository.save(booking);
+
         return bookingMapper.toDto(booking);
     }
 
     @Override
     public BookingDTO confirmBookingCancellation(Long bookingId, BookingDTO bookingDTO) {
+        log.info("Fetching booking with ID {} from DB", bookingId);
         Optional<Booking> existingBooking = bookingRepository.findById(bookingId);
         checkIfBookingExist(existingBooking);
         Booking booking = existingBooking.get();
 
         if (bookingDTO.getIsCancelled() && booking.getIsCancelled()) {
+            log.error("Booking with ID {} is already cancelled", bookingId);
             throw new GeneralException("Booking is already cancelled.");
         }
 
@@ -77,8 +83,7 @@ public class BookingServiceImpl implements BookingService {
                 booking.setCancellationReason(null);
             }
         }
-
-        // Save the updated booking in the database
+        log.info("Saving updated booking with ID {} to DB", bookingId);
         booking = bookingRepository.save(booking);
 
         return bookingMapper.toDto(booking);
@@ -97,10 +102,13 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingDTO createBooking(Booking booking, String email) {
+
         if (booking.getBookingFlights() == null || booking.getBookingFlights().size() < 1) {
+            log.error("There should be one flight included in the booking");
             throw new GeneralException("At least one flight should be included in the booking.");
         }
 
+        log.info("Fetching the user from DB to create the flight");
         UserApp user =userRepository.findByEmail(email).
                 orElseThrow(() -> new GeneralException("No user found with email: " + email));
 
@@ -109,21 +117,27 @@ public class BookingServiceImpl implements BookingService {
         for (BookingFlight bookingFlight : booking.getBookingFlights()) {
             Optional<Flight> flight = flightRepository.findById(bookingFlight.getFlight().getId());
             if (flight.isEmpty()) {
+                log.error("Flight with ID {} does not exist", bookingFlight.getId());
                 throw new GeneralException("Flight with ID " + bookingFlight.getId() + " does not exist.");
             }
             // Check if the flight has already departed
             else if (flight.get().getDepartureDate().before(new Date())){
+                log.error("Flight {} has already departed", flight.get().getFlightNumber());
                 throw new GeneralException("Flight " + flight.get().getFlightNumber() + " has already departed.");
             }
 
             // Check if there are enough seats available in the requested booking class
             int availableSeats = getAvailableSeats(flight.get(), bookingFlight.getBookingClass());
             if (availableSeats <= 0) {
+                log.error("Not enough seats available in the requested booking class for flight {}",
+                        flight.get().getFlightNumber());
                 throw new GeneralException("Not enough seats available in the requested booking class for flight "
                         + flight.get().getFlightNumber());
             } else {
                 int availableClassSeats = getAvailableSeats(flight.get(), bookingFlight.getBookingClass());
                 if (availableClassSeats <= 0) {
+                    log.error("Not enough seats available in the requested booking class for flight {}",
+                            flight.get().getFlightNumber());
                     throw new GeneralException("Not enough seats available in the requested booking class for flight "
                             + flight.get().getFlightNumber());
                 } else {
@@ -135,7 +149,7 @@ public class BookingServiceImpl implements BookingService {
             }
             bookingFlight.setBooking(booking);
         }
-        // Create the booking
+
         booking.setIsCancelled(false);
         booking.setAwaitingCancellation(false);
         booking.setCancellationReason(null);

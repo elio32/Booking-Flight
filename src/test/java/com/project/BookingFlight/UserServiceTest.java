@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,8 +24,6 @@ public class UserServiceTest {
     @Mock
     private UserMapper userMapper;
 
-    @Mock
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @InjectMocks
     private UserServiceImpl userService;
@@ -41,13 +38,13 @@ public class UserServiceTest {
 
         UserApp user1 = new UserApp();
         user1.setId(1L);
-        user1.setUsername("user1");
-        user1.setEmail("user1@example.com");
+        user1.setUsername("Beni");
+        user1.setEmail("beni@yahoo.com");
 
         UserApp user2 = new UserApp();
         user2.setId(2L);
-        user2.setUsername("user2");
-        user2.setEmail("user2@example.com");
+        user2.setUsername("elio");
+        user2.setEmail("elio@gmail.com");
 
         List<UserApp> userList = new ArrayList<>();
         userList.add(user1);
@@ -58,13 +55,13 @@ public class UserServiceTest {
 
         UserDTO userDto1 = new UserDTO();
         userDto1.setId(1L);
-        userDto1.setUsername("user1");
-        userDto1.setEmail("user1@example.com");
+        userDto1.setUsername("Beni");
+        userDto1.setEmail("beni@yahoo.com");
 
         UserDTO userDto2 = new UserDTO();
         userDto2.setId(2L);
-        userDto2.setUsername("user2");
-        userDto2.setEmail("user2@example.com");
+        userDto2.setUsername("elio");
+        userDto2.setEmail("elio@gmail.com");
 
         List<UserDTO> expectedUserDtoList = new ArrayList<>();
         expectedUserDtoList.add(userDto1);
@@ -73,10 +70,8 @@ public class UserServiceTest {
         when(userMapper.toDto(user1)).thenReturn(userDto1);
         when(userMapper.toDto(user2)).thenReturn(userDto2);
 
-        // Call the method to get all users
         List<UserDTO> actualUserDtoList = userService.getAllUsers();
 
-        // Verify the result
         assertEquals(expectedUserDtoList.size(), actualUserDtoList.size());
 
     }

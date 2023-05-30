@@ -3,9 +3,9 @@
     <include resource="org/springframework/boot/logging/logback/base.xml"/>
 
     <appender name="FILE_APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <!--        <File>C:/Users/U748375/Desktop/logs/log_file.log</File>--> <!--me jep error-->
+                <File>Users/Desktop/logs/log_file.log</File>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>C:/Users/U748375/Desktop/log_file.%d.log.gz</fileNamePattern>
+            <fileNamePattern>Users/Desktop/log_file.%d.log.gz</fileNamePattern>
             <!-- keep 30 days' worth of history capped at 3GB total size -->
             <maxHistory>30</maxHistory>
             <totalSizeCap>3GB</totalSizeCap>
