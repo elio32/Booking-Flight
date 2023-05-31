@@ -22,20 +22,28 @@ public class UserApp implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(name = "username",nullable = false,unique = true)
     private String username;
+
     @Column(name = "password",nullable = false,unique = true)
     private String password;
+
     @Column(name ="firstname" ,nullable = false)
     private String firstName;
+
     @Column(name ="lastname" ,nullable = false)
     private String lastName;
+
     @Column(name ="email" ,nullable = false,unique = true)
     private String email;
+
     @Column(name ="phonenumber" ,nullable = false)
     private String phoneNumber;
+
     @Column(name ="address" ,nullable = false)
     private String address;
+
     @Column(name ="role" ,nullable = false)
     @Enumerated(value = EnumType.STRING)
     private UserRoleEnum role;

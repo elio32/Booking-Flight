@@ -21,8 +21,11 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 public class FlightServiceImpl implements FlightService {
+
     private final FlightRepository flightRepository;
+
     private final FlightMapper flightMapper;
+
     private final BookingRepository bookingRepository;
     @Override
     public List<FlightDTO> getAllFlights() {

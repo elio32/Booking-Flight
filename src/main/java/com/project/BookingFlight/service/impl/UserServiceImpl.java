@@ -26,10 +26,15 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
+
     private final UserRepository userRepository;
+
     private final UserMapper userMapper;
+
     private final FlightRepository flightRepository;
+
     private final BookingRepository bookingRepository;
+
     private final BCryptPasswordEncoder encoder;
 
     @Override

@@ -24,9 +24,13 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 public class BookingServiceImpl implements BookingService {
+
     private final FlightRepository flightRepository;
+
     private final UserRepository userRepository;
+
     private final BookingRepository bookingRepository;
+
     private final BookingMapper bookingMapper;
 
     @Override

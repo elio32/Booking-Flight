@@ -19,6 +19,7 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 @RequestMapping(path = "/booking")
 @RequiredArgsConstructor
 public class BookingController {
+
     private final BookingService bookingService;
 
     @PreAuthorize(value = "hasAnyRole('ADMIN')")

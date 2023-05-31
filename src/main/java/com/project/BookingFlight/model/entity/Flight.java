@@ -16,6 +16,7 @@ public class Flight {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(name = "airlineCode",nullable = false)
     private String airlineCode;
     @Column(name = "flightNumber",nullable = false,unique = true)

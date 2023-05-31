@@ -16,13 +16,16 @@ public class BookingFlight {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @ManyToOne
     @JoinColumn(name = "booking_id", nullable = false)
     @JsonIgnore
     private Booking booking;
+
     @ManyToOne
     @JoinColumn(name = "flight_id", nullable = false)
     private Flight flight;
+
     @Column(name ="booking_class" ,nullable = false)
     @Enumerated(value = EnumType.STRING)
     private BookingClassesEnum bookingClass;
