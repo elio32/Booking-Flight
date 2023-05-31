@@ -29,7 +29,7 @@ public class AuthenticationController {
         }catch (GeneralException e){
             e.printStackTrace();
             System.err.println("Error: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
     }
     @PostMapping("/register")
