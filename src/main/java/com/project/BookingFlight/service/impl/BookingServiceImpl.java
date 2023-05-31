@@ -68,20 +68,17 @@ public class BookingServiceImpl implements BookingService {
             throw new GeneralException("Booking is already cancelled.");
         }
 
-        if (bookingDTO.getIsCancelled() != null) {
-            // Update booking status to "Cancelled" if isCancelled is true
-            booking.setIsCancelled(bookingDTO.getIsCancelled());
+        // Update booking status to "Cancelled" if isCancelled is true
+        booking.setIsCancelled(bookingDTO.getIsCancelled());
 
-            if (bookingDTO.getIsCancelled() && booking.getAwaitingCancellation()) {
-                // Admin approves the cancellation request
-                booking.setAwaitingCancellation(false);
+        if (bookingDTO.getIsCancelled() && booking.getAwaitingCancellation()) {
+            // Admin approves the cancellation request
+            booking.setAwaitingCancellation(false);
+            booking.setCancellationReason(null);
 
-                // Set cancellation reason to null if isCancelled is true
-                booking.setCancellationReason(null);
-            } else if (!bookingDTO.getIsCancelled() && booking.getIsCancelled()) {
-                // Admin changes the cancellation request from declined to accepted
-                booking.setCancellationReason(bookingDTO.getCancellationReason());
-            }
+        } else if (!bookingDTO.getIsCancelled() && booking.getIsCancelled()) {
+            // Admin changes the cancellation request from declined to accepted
+            booking.setCancellationReason(bookingDTO.getCancellationReason());
         }
         log.info("Saving updated booking with ID {} to DB", bookingId);
         booking = bookingRepository.save(booking);
@@ -96,11 +93,16 @@ public class BookingServiceImpl implements BookingService {
             throw new GeneralException("User ID is required.");
         }
 
+        if (!userRepository.existsById(userId)) {
+            log.error("User with ID {} does not exist.", userId);
+            throw new GeneralException("User with ID " + userId + " does not exist.");
+        }
+
         if (pagination == null) {
             pagination = new Pagination();
         }
 
-        log.info("Fetching all bookings for user with ID {} with pagination {}", userId, pagination);
+        log.info("Fetching all bookings for user with ID {}", userId);
         Pageable pageable = PageRequest.of(pagination.getPageNumber(), pagination.getPageSize(),
                 pagination.getSortByAscendingOrder() ? Sort.by(pagination.getSortByProperty()).ascending()
                         : Sort.by(pagination.getSortByProperty()).descending());
@@ -128,7 +130,6 @@ public class BookingServiceImpl implements BookingService {
                 log.error("Flight with ID {} does not exist", bookingFlight.getId());
                 throw new GeneralException("Flight with ID " + bookingFlight.getId() + " does not exist.");
             }
-            // Check if the flight has already departed
             else if (flight.get().getDepartureDate().before(new Date())){
                 log.error("Flight {} has already departed", flight.get().getFlightNumber());
                 throw new GeneralException("Flight " + flight.get().getFlightNumber() + " has already departed.");
@@ -147,7 +148,6 @@ public class BookingServiceImpl implements BookingService {
 
                 bookingFlight.setBooking(booking);
             }
-            bookingFlight.setBooking(booking);
         }
 
         booking.setIsCancelled(false);

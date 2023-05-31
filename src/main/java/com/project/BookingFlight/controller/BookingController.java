@@ -77,7 +77,6 @@ public class BookingController {
         }
     }
 
-    //create booking
     @PreAuthorize(value = "hasAnyRole('TRAVELLER')")
     @PostMapping("/createBooking")
     public ResponseEntity<BookingDTO> createBooking(@RequestBody Booking request, Principal principal) {

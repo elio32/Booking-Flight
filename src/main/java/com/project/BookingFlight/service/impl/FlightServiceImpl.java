@@ -29,12 +29,11 @@ public class FlightServiceImpl implements FlightService {
         return flightRepository.findAll().stream().map(flightMapper::toDto).collect(Collectors.toList());
     }
 
-    //delete a flight if it has no bookings
     @Override
     public void deleteFlight(Long id) {
         log.info("Fetching flight with id {} from DB" ,id);
         Flight flight = flightRepository.findById(id).
-                orElseThrow(() -> new GeneralException("Flight with this id doesn't exist " + id));
+                orElseThrow(() -> new GeneralException("Flight with this id " + id + "doesn't exist"));
 
         checkIfExist(Optional.ofNullable(flight));
         //checks if flights has bookings
@@ -52,7 +51,7 @@ public class FlightServiceImpl implements FlightService {
         Optional<Flight> existingFlight = flightRepository.findByFlightNumber(flight.getFlightNumber());
         if (existingFlight.isPresent()){
             log.error("Flight with flightNumber {} already exists",flight.getFlightNumber());
-            throw new GeneralException("Flight with this flightNumber already exists ");
+            throw new GeneralException("Flight with this flightNumber " + flight.getFlightNumber() + " already exists");
         }
         log.info("Saving new flight{} to DB",flight.getFlightNumber());
         flight = flightRepository.save(flight);
@@ -62,11 +61,7 @@ public class FlightServiceImpl implements FlightService {
     @Override
     public List<FlightDTO> findFlightByOriginOrDestinationOrDepartureDateOrAirlineCode(String origin, String destination,
                                                                                        Date departureDate, String airlineCode) {
-        log.info("Searching for a flight by Origin {} or Destination {} or " +
-                "Departure Date {} or Airline Code {}",origin,destination,departureDate,airlineCode);
-        if (origin == null || destination == null || departureDate == null) {
-            throw new GeneralException("Enter the correct information for Origin, destination, and departure date.");
-        }
+        log.info("Looking if the flight is in the future");
         Date currentDate = new Date();
         if (departureDate.before(currentDate)) {
             throw new GeneralException("Flight date cannot be in the past");
@@ -79,6 +74,11 @@ public class FlightServiceImpl implements FlightService {
         } else {
             List<Flight> flightList = flightRepository.findByOriginAndDestinationAndDepartureDate
                     (origin, destination, departureDate);
+
+            if (flightList.isEmpty()) {
+                throw new GeneralException("Enter correct information about the flight you are looking for");
+            }
+
             return flightList.stream().map(flightMapper::toDto).collect(Collectors.toList());
         }
     }
@@ -89,7 +89,6 @@ public class FlightServiceImpl implements FlightService {
         log.info("Updating flight {}", existingFlight.getFlightNumber());
 
         if (hasTravelerBookings(existingFlight)) {
-            // If the flight has bookings, only update the departure time
             if (requestedFlight.getDepartureTime() != null) {
                 existingFlight.setDepartureTime(requestedFlight.getDepartureTime());
             } else {
