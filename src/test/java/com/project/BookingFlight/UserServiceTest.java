@@ -50,7 +50,6 @@ public class UserServiceTest {
         userList.add(user1);
         userList.add(user2);
 
-        // Set up mock behavior
         when(userRepository.findAll()).thenReturn(userList);
 
         UserDTO userDto1 = new UserDTO();
