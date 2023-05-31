@@ -34,7 +34,7 @@ public class FlightServiceTest {
     }
 
     @Test
-    public void testSaveNewFlight_WhenFlightNumberIsUnique_ShouldSaveFlight() {
+    public void testSaveNewFlight() {
 
         FlightDTO flightDTO = new FlightDTO();
         flightDTO.setFlightNumber("AA200");
